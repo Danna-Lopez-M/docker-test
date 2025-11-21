@@ -1,5 +1,11 @@
 name: Docker Build and Push
 
+# IMPORTANTE: Configura estos secretos en GitHub:
+# Settings → Secrets and variables → Actions
+# - DOCKER_USERNAME: Tu nombre de usuario de Docker Hub
+# - DOCKER_PASSWORD: Un Access Token de Docker Hub (NO tu contraseña)
+#   Para crear un token: https://hub.docker.com/settings/security → New Access Token
+
 on:
   push:
     branches:
@@ -11,7 +17,6 @@ on:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build-and-push:
@@ -33,11 +38,19 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      - name: Set image name
+        id: image
+        run: |
+          REPO_NAME=$(echo "${{ github.repository }}" | cut -d'/' -f2)
+          IMAGE_NAME="${{ secrets.DOCKER_USERNAME }}/${REPO_NAME}"
+          echo "IMAGE_NAME=${IMAGE_NAME}" >> $GITHUB_OUTPUT
+          echo "Building image: ${{ env.REGISTRY }}/${IMAGE_NAME}"
+
       - name: Extract metadata (for tags)
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ steps.image.outputs.IMAGE_NAME }}
           tags: |
             type=ref,event=branch
             type=ref,event=pr
