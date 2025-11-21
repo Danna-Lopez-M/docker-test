@@ -1,11 +1,6 @@
 name: Docker Build and Push
-
-# IMPORTANTE: Configura estos secretos en GitHub:
-# Settings → Secrets and variables → Actions
 # - DOCKER_USERNAME: Tu nombre de usuario de Docker Hub
 # - DOCKER_PASSWORD: Un Access Token de Docker Hub (NO tu contraseña)
-#   Para crear un token: https://hub.docker.com/settings/security → New Access Token
-
 on:
   push:
     branches:
